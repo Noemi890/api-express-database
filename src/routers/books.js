@@ -36,4 +36,18 @@ router.post('/', async (req, res) => {
   })
 })
 
+router.get('/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const params = []
+  const SQLMainQuery = 'SELECT * FROM books WHERE id = $1'
+
+  params.push(id)
+
+  const queryRes = await db.query(SQLMainQuery, params)
+
+  res.json({
+    book: queryRes.rows
+  })
+
+})
 module.exports = router
