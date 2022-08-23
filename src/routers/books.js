@@ -23,7 +23,17 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  
+  const SQLMainQuery = 'INSERT INTO books (title, type, author, topic, publicationdate, pages)  VALUES ($1, $2, $3, $4, $5, $6)'
+  const params = []
+  const {title, type, author, topic, publicationdate, pages} = req.body
+  params.push(title, type, author, topic, publicationdate, pages)
+  console.log(params)
+  const queryResult = await db.query(SQLMainQuery, params)
+
+  const bookCreated = await db.query(`SELECT * FROM books WHERE title = '${title}'`)
+  res.json({
+    book: bookCreated.rows
+  })
 })
 
 module.exports = router
