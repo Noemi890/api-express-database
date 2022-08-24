@@ -43,4 +43,23 @@ router.get('/:id', async (req, res) => {
   })
 })
 
+router.put('/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const params = Object.values(req.body)
+  const size = Object.keys(req.body).length
+  let SQLmain = 'UPDATE pets SET '
+
+  Object.keys(req.body).map((key, i) => {
+    SQLmain += `${key} = $${i+1}`
+    if (i +1 < size) SQLmain += ', '
+    return SQLmain
+  })
+
+  SQLmain += ` WHERE id = ${id} RETURNING *`
+
+  const pet = await db.query(SQLmain, params)
+
+  res.status(201).json({ pet: pet.rows })
+})
+
 module.exports = router
