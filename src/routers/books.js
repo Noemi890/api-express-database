@@ -3,36 +3,36 @@ const router = express.Router()
 const db = require("../../db");
 
 router.get('/', async (req, res) => {
-  const type = req.query.type
+  const { type, topic } = req.query
+  const size = Object.keys(req.query).length
   let SQLMainQuery = 'SELECT * FROM books'
   const params = []
+  params.push(type, topic)
 
-  if (type) {
-    SQLMainQuery += ' WHERE type = $1'
-    params.push(type)
+  if(size) {
+    SQLMainQuery += ' WHERE'
+
+    Object.keys(req.query).map((key, i) => {
+      SQLMainQuery += ` ${key} = $${i+1}`
+      if (i + 1 < size) SQLMainQuery += ' AND'
+    })
   }
 
-  console.log(SQLMainQuery)
-
   const queryResult = await db.query(SQLMainQuery, params)
-  console.log('my result', queryResult)
-
+  
   res.json({
     books: queryResult.rows
   })
 })
 
 router.post('/', async (req, res) => {
-  const SQLMainQuery = 'INSERT INTO books (title, type, author, topic, publicationdate, pages)  VALUES ($1, $2, $3, $4, $5, $6)'
+  const SQLMainQuery = 'INSERT INTO books (title, type, author, topic, publicationdate, pages)  VALUES ($1, $2, $3, $4, $5, $6) RETURNING *'
   const params = []
-  const {title, type, author, topic, publicationdate, pages} = req.body
-  params.push(title, type, author, topic, publicationdate, pages)
-  console.log(params)
+  Object.values(req.body).forEach(val => params.push(val))
   const queryResult = await db.query(SQLMainQuery, params)
 
-  const bookCreated = await db.query(`SELECT * FROM books WHERE title = '${title}'`)
   res.status(201).json({
-    book: bookCreated.rows
+    book: queryResult.rows
   })
 })
 
