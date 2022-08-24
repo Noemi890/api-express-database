@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { getAll } = require('../models/booksRepo')
+const { getAll, postBook } = require('../models/booksRepo')
 
 router.get('/', async (req, res) => {
 
@@ -12,12 +12,14 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  const SQLMainQuery = 'INSERT INTO books (title, type, author, topic, publicationdate, pages)  VALUES ($1, $2, $3, $4, $5, $6) RETURNING *'
-  const params = Object.values(req.body)
-  const queryResult = await db.query(SQLMainQuery, params)
+
+  if (Object.keys(req.body).length < 6) res.status(400).json('Missing fields')
+
+  const book = await postBook(req.body)
+  console.log(book)
 
   res.status(201).json({
-    book: queryResult.rows
+    book
   })
 })
 

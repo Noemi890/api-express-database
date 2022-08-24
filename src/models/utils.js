@@ -15,6 +15,24 @@ const buildWhereSQL = (params, mainSQL) => {
   return mainSQL
 }
 
+const buildInsertSQL = (SQL, params) => {
+  const keys = Object.keys(params)
+  const values = Object.values(params)
+  let col = '('
+  let val = ' VALUES ('
+  keys.forEach((key, i) => {
+    col += `${key}`
+    val += `$${i+1}`
+
+    i+1 < keys.length ? col += ', ' : col += ')'
+    i+1 < values.length ? val += ', ' : val += ') RETURNING *'
+
+  })
+  
+  return SQL + col + val
+}
+
 module.exports = {
-  buildWhereSQL
+  buildWhereSQL,
+  buildInsertSQL
 }
