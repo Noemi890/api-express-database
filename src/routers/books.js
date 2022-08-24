@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
   const queryResult = await db.query(SQLMainQuery, params)
 
   const bookCreated = await db.query(`SELECT * FROM books WHERE title = '${title}'`)
-  res.json({
+  res.status(201).json({
     book: bookCreated.rows
   })
 })
@@ -49,5 +49,39 @@ router.get('/:id', async (req, res) => {
     book: queryRes.rows
   })
 
+})
+
+router.put('/:id', async (req, res) => {
+  const id = Number(req.params.id)
+  const params = []
+  const myObj = req.body
+  const size = Object.keys(myObj).length
+  Object.values(myObj).forEach(val => params.push(val))
+  let SQLMainQuery = 'UPDATE books SET '
+
+  console.log(myObj)
+
+  Object.keys(myObj).map((key, i) => {
+  SQLMainQuery += `${key} = $${i +1}`
+  if(i +1 < size) SQLMainQuery += ", "
+  return SQLMainQuery
+  })
+
+  SQLMainQuery += ` WHERE id = ${id}`
+
+  const qRes = await db.query(SQLMainQuery, params)
+  console.log(qRes)
+
+  const updatedBook = await db.query(`SELECT * FROM books WHERE id = ${id}`)
+
+  res.status(201).json({
+    book: updatedBook.rows
+  })
+
+
+})
+
+router.delete('/:id', async (req, res) => {
+  
 })
 module.exports = router
