@@ -32,4 +32,15 @@ router.post('/', async (req, res) => {
   
 })
 
+router.get('/:id', async (req, res) => {
+  const id = Object.values(req.params)
+  const mainSQL = 'SELECT * FROM pets WHERE id = $1'
+
+  const result = await db.query(mainSQL, id)
+
+  res.json({
+    pet: result.rows
+  })
+})
+
 module.exports = router
