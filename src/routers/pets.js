@@ -62,4 +62,13 @@ router.put('/:id', async (req, res) => {
   res.status(201).json({ pet: pet.rows })
 })
 
+router.delete('/:id', async (req, res) => {
+  const params = Object.values(req.params)
+  let mainSQL = 'DELETE FROM pets WHERE id = $1 RETURNING *'
+
+  const pet = (await db.query(mainSQL, params)).rows
+
+  res.status(200).json({pet})
+})
+
 module.exports = router
