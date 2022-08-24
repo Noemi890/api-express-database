@@ -1,25 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const db = require("../../db");
+const { getAll } = require('../models/booksRepo')
 
 router.get('/', async (req, res) => {
-  const size = Object.keys(req.query).length
-  let SQLMainQuery = 'SELECT * FROM books'
-  const params = Object.values(req.query)
 
-  if(size) {
-    SQLMainQuery += ' WHERE'
+  const books = await getAll(Object.keys(req.query), Object.values(req.query))
 
-    Object.keys(req.query).map((key, i) => {
-      SQLMainQuery += ` ${key} = $${i+1}`
-      if (i + 1 < size) SQLMainQuery += ' AND'
-    })
-  }
-
-  const queryResult = await db.query(SQLMainQuery, params)
-  
   res.json({
-    books: queryResult.rows
+    books
   })
 })
 
