@@ -3,11 +3,9 @@ const router = express.Router()
 const db = require("../../db");
 
 router.get('/', async (req, res) => {
-  const { type, topic } = req.query
   const size = Object.keys(req.query).length
   let SQLMainQuery = 'SELECT * FROM books'
-  const params = []
-  params.push(type, topic)
+  const params = Object.values(req.query)
 
   if(size) {
     SQLMainQuery += ' WHERE'
@@ -27,8 +25,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const SQLMainQuery = 'INSERT INTO books (title, type, author, topic, publicationdate, pages)  VALUES ($1, $2, $3, $4, $5, $6) RETURNING *'
-  const params = []
-  Object.values(req.body).forEach(val => params.push(val))
+  const params = Object.values(req.body)
   const queryResult = await db.query(SQLMainQuery, params)
 
   res.status(201).json({
